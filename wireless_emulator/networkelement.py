@@ -624,9 +624,9 @@ class NetworkElement:
         self.buildCoreModelXml()
         self.buildCoreModelStatusXml()
 
-        if self.ptpEnabled is True:
-            self.buildPtpModelConfigXml()
-            self.buildPtpModelStatusXml()
+        #if self.ptpEnabled is True:
+        #    self.buildPtpModelConfigXml()
+        #    self.buildPtpModelStatusXml()
 
         self.buildNotificationStatusXml()
 

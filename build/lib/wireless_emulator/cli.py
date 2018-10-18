@@ -3,7 +3,7 @@ import sys
 from select import poll, POLLIN
 import string
 from subprocess import call
-import psutil, os, time
+#import psutil, os, time
 from timeit import default_timer as timer
 from multiprocessing import Process, Manager
 import multiprocessing
@@ -223,46 +223,46 @@ class CLI(Cmd):
                 print('ERROR: usage: unmount <all> for unmounting all NEs')
                 print('ERROR: usage: unmount <NE_uuid> for unmounting a single network element')
 
-    def do_print_resource_usage(self, line):
-        "Compute the average amount of resources (CPU and Memory) consumed by the WTE in a specified interval"
-        memory_percent = 0.0
-        args = line.split()
-
-        start = timer()
-
-        interval = 10
-        if len(args) > 0:
-            interval = int(args[0])
-
-        print("Computing CPU and memory usage by taking %d samples. Please wait..." % interval)
-
-        # processes = []
-        # results = Manager().dict()
-        # for i, ne in enumerate(self.emulator.networkElementList):
-        #     p = Process(target=ne.getCpuUsage, args=(interval, i, results))
-        #     processes.append(p)
-        #     p.start()
-        # for p in processes:
-        #     p.join()
-
-        cpu_percent = 0.0
-        for i in range(0, interval):
-            cpu_percent += self.emulator.getCpuUsage()
-
-        cpu_percent /= float(interval)
-
-        cpu_percent /= float(multiprocessing.cpu_count())
-
-        # for ne in self.emulator.networkElementList:
-        #     cmd = "ps -g `docker inspect -f '{{.State.Pid}}' %s` --no-headers -o \"pmem\"" % ne.dockerName
-        #     output = self.emulator.executeCommandAndGetResultInOS(cmd)
-        #     for line in output:
-        #         memory_percent += float(line)
-
-        memory_percent = self.emulator.getMemUsage()
-
-        end = timer()
-
-        print('CPU Usage: %2.2f%%' % cpu_percent)
-        print('Memory usage: %2.2f%%' % memory_percent)
-        print('Command took %6.3f seconds' % (end - start))
+    # def do_print_resource_usage(self, line):
+    #     "Compute the average amount of resources (CPU and Memory) consumed by the WTE in a specified interval"
+    #     memory_percent = 0.0
+    #     args = line.split()
+    #
+    #     start = timer()
+    #
+    #     interval = 10
+    #     if len(args) > 0:
+    #         interval = int(args[0])
+    #
+    #     print("Computing CPU and memory usage by taking %d samples. Please wait..." % interval)
+    #
+    #     # processes = []
+    #     # results = Manager().dict()
+    #     # for i, ne in enumerate(self.emulator.networkElementList):
+    #     #     p = Process(target=ne.getCpuUsage, args=(interval, i, results))
+    #     #     processes.append(p)
+    #     #     p.start()
+    #     # for p in processes:
+    #     #     p.join()
+    #
+    #     cpu_percent = 0.0
+    #     for i in range(0, interval):
+    #         cpu_percent += self.emulator.getCpuUsage()
+    #
+    #     cpu_percent /= float(interval)
+    #
+    #     cpu_percent /= float(multiprocessing.cpu_count())
+    #
+    #     # for ne in self.emulator.networkElementList:
+    #     #     cmd = "ps -g `docker inspect -f '{{.State.Pid}}' %s` --no-headers -o \"pmem\"" % ne.dockerName
+    #     #     output = self.emulator.executeCommandAndGetResultInOS(cmd)
+    #     #     for line in output:
+    #     #         memory_percent += float(line)
+    #
+    #     memory_percent = self.emulator.getMemUsage()
+    #
+    #     end = timer()
+    #
+    #     print('CPU Usage: %2.2f%%' % cpu_percent)
+    #     print('Memory usage: %2.2f%%' % memory_percent)
+    #     print('Command took %6.3f seconds' % (end - start))

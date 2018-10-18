@@ -478,9 +478,9 @@ class MwpsInterface:
         #this needs to be done after the microwave model status, for the transmission mode UUIDs to be generated
         self.buildMicrowaveModelXml()
 
-        if self.neObj.ptpEnabled is True:
-            self.buildPtpModelConfigXml()
-            self.buildPtpModelStatusXml()
+        #if self.neObj.ptpEnabled is True:
+        #    self.buildPtpModelConfigXml()
+        #    self.buildPtpModelStatusXml()
 
     def findRadioSignalId(self):
         for link in self.emEnv.topoJson['topologies']['mwps']['links']:
@@ -1433,9 +1433,9 @@ class ElectricalEtyInterface:
         self.buildMicrowaveModelXml()
         self.buildMicrowaveModelStatusXml()
 
-        if self.neObj.ptpEnabled is True:
-            self.buildPtpModelConfigXml()
-            self.buildPtpModelStatusXml()
+        #if self.neObj.ptpEnabled is True:
+        #    self.buildPtpModelConfigXml()
+        #    self.buildPtpModelStatusXml()
 
 
 class EthCtpInterface:
@@ -1607,5 +1607,5 @@ class EthCtpInterface:
 
         self.buildCoreModelConfigXml()
         self.buildCoreModelStatusXml()
-        self.buildEthernetModelConfigXml()
-        self.buildEthernetModelStatusXml()
+        #self.buildEthernetModelConfigXml()
+        #self.buildEthernetModelStatusXml()

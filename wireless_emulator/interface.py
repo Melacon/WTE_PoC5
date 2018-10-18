@@ -310,6 +310,9 @@ class MwpsInterface:
         airInterfaceStatus = airInterface.find('air-interface-status')
         transmissionModeCur = airInterfaceStatus.find('transmission-mode-cur')
         transmissionModeCur.text = self.transmissionModeIdList[0]
+        if self.radioSignalId is not None:
+            receivedSignalId = airInterfaceStatus.find('received-signal-id')
+            receivedSignalId.text = self.radioSignalId
 
         airInterfaceCurrentPerformance = airInterface.find('air-interface-current-performance')
         self.addCurrentPerformanceXmlValues(airInterfaceCurrentPerformance)

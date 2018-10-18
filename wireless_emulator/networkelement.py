@@ -474,7 +474,7 @@ class NetworkElement:
                     intfObj = MwpsInterface(port['id'], portNumId, self, port['supportedAlarms'],
                                             port['physical-port-reference'], port['conditional-package'])
                     portNumId += 1
-                    intfObj.buildXmlFiles()
+                    #intfObj.buildXmlFiles()
                     self.interfaceList.append(intfObj)
 
             elif intf['layer'] == "MWS":
@@ -483,7 +483,7 @@ class NetworkElement:
                     intfObj = MwsInterface(port['id'], portNumId, self, port['supportedAlarms'], port['serverLTPs'],
                                            port['conditional-package'])
                     portNumId += 1
-                    intfObj.buildXmlFiles()
+                    #intfObj.buildXmlFiles()
                     self.interfaceList.append(intfObj)
 
             elif intf['layer'] == "ETC":
@@ -493,7 +493,7 @@ class NetworkElement:
                         intfObj = MwEthContainerInterface(port['id'], portNumId, self, port['supportedAlarms'],
                                                           port['serverLTPs'], port['conditional-package'])
                     portNumId += 1
-                    intfObj.buildXmlFiles()
+                    #intfObj.buildXmlFiles()
                     self.interfaceList.append(intfObj)
 
             elif intf['layer'] == "ETY":
@@ -502,7 +502,7 @@ class NetworkElement:
                     intfObj = ElectricalEtyInterface(port['id'], portNumId, self, port['physical-port-reference'])
 
                     portNumId += 1
-                    intfObj.buildXmlFiles()
+                    #intfObj.buildXmlFiles()
                     self.interfaceList.append(intfObj)
 
             elif intf['layer'] == "ETH":
@@ -511,13 +511,17 @@ class NetworkElement:
                     intfObj = EthCtpInterface(port['id'], portNumId, self, port['serverLTPs'],
                                               port['conditional-package'])
                     portNumId += 1
-                    intfObj.buildXmlFiles()
+                    #intfObj.buildXmlFiles()
                     self.interfaceList.append(intfObj)
 
             else:
                 logger.critical("Illegal layer value %s found in JSON configuration file for NE=%s",
                                 intf['layer'], self.uuid)
                 raise ValueError("Illegal layer value")
+
+    def buildXmlFilesForInterfaces(self):
+        for intfObj in self.interfaceList:
+            intfObj.buildXmlFiles()
 
     def addEthCrossConnections(self):
         if self.eth_x_connect is not None:
@@ -631,6 +635,7 @@ class NetworkElement:
         self.buildNotificationStatusXml()
 
         self.createInterfaces()
+        self.buildXmlFilesForInterfaces()
         self.addEthCrossConnections()
 
         self.createDockerContainer()

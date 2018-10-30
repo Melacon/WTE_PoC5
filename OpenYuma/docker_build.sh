@@ -1,1 +1,1 @@
-docker build -t openyumawte5 .
+docker build -t openyumawte5 .; docker image prune -f

@@ -385,7 +385,7 @@ represents the amount of **seconds** between each such  random notifications.
 
 * Starting the emulator is done with the following command (asuming you are in the base folder):
 
-`sudo wtemulator --config=config.json --topo=topology.json --xml=yang/microwave-model-config.xml`
+`sudo wtemulatorpoc5 --config=config.json --topo=topology.json --xml=yang/microwave-model-config.xml`
 
 Alternatively, the emulator can be starting using the `start.sh` script, after you configure there what topology file to be used:
 
@@ -397,7 +397,7 @@ all the previously created docker containers, docker networks.
 * Cleaning might be necessary if previous runs were not terminated correctly. This will delete
 all the previously created docker containers, docker networks.
 
-`sudo wtemulator --config=config.json --clean`
+`sudo wtemulatorpoc5 --config=config.json --clean`
 
 Alternatively:
 

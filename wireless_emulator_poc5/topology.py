@@ -1,6 +1,6 @@
 import logging
 
-from wireless_emulator.link import Link
+from wireless_emulator_poc5.link import Link
 
 logger=logging.getLogger(__name__)
 

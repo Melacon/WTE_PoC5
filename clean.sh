@@ -1,1 +1,1 @@
-sudo wtemulator --config=config.json --clean
+sudo wtemulatorpoc5 --config=config.json --clean

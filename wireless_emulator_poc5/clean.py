@@ -1,8 +1,8 @@
 import logging
 import subprocess
 import json
-from wireless_emulator.odlregistration import unregisterNeFromOdl, unregisterNeFromOdlNewVersion
-import wireless_emulator.emulator
+from wireless_emulator_poc5.odlregistration import unregisterNeFromOdl, unregisterNeFromOdlNewVersion
+import wireless_emulator_poc5.emulator
 
 logger = logging.getLogger(__name__)
 

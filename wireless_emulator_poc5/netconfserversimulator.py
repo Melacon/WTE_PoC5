@@ -4,11 +4,11 @@ import xml.etree.ElementTree as ET
 import copy
 import os
 
-import wireless_emulator.emulator
-from wireless_emulator.utils import addCoreDefaultValuesToNode, printErrorAndExit, addCoreDefaultStatusValuesToNode
-from wireless_emulator.interface import *
-from wireless_emulator.odlregistration import registerNeToOdl, registerNeToOdlNewVersion
-import wireless_emulator.ethCrossConnect as EthXConn
+import wireless_emulator_poc5.emulator
+from wireless_emulator_poc5.utils import addCoreDefaultValuesToNode, printErrorAndExit, addCoreDefaultStatusValuesToNode
+from wireless_emulator_poc5.interface import *
+from wireless_emulator_poc5.odlregistration import registerNeToOdl, registerNeToOdlNewVersion
+import wireless_emulator_poc5.ethCrossConnect as EthXConn
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +25,7 @@ class NetconfServerSimulator:
         else:
             self.xmlFile = neParamObject.get('xmlFile')
 
-        self.emEnv = wireless_emulator.emulator.Emulator()
+        self.emEnv = wireless_emulator_poc5.emulator.Emulator()
 
         self.networkIPAddress = self.emEnv.mgmtIpFactory.getFreeManagementNetworkIP()
         if self.networkIPAddress is None:

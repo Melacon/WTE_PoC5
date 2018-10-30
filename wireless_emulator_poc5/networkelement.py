@@ -5,11 +5,11 @@ import copy
 import os
 from io import StringIO
 
-import wireless_emulator.emulator
-from wireless_emulator.utils import addCoreDefaultValuesToNode, printErrorAndExit, addCoreDefaultStatusValuesToNode
-from wireless_emulator.interface import *
-from wireless_emulator.odlregistration import registerNeToOdl, registerNeToOdlNewVersion
-import wireless_emulator.ethCrossConnect as EthXConn
+import wireless_emulator_poc5.emulator
+from wireless_emulator_poc5.utils import addCoreDefaultValuesToNode, printErrorAndExit, addCoreDefaultStatusValuesToNode
+from wireless_emulator_poc5.interface import *
+from wireless_emulator_poc5.odlregistration import registerNeToOdl, registerNeToOdlNewVersion
+import wireless_emulator_poc5.ethCrossConnect as EthXConn
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +26,7 @@ class NetworkElement:
             self.ptpEnabled = True
             logger.debug("PTP is enabled. Clock instance is %s", self.ptpClockInstance)
 
-        self.emEnv = wireless_emulator.emulator.Emulator()
+        self.emEnv = wireless_emulator_poc5.emulator.Emulator()
 
         # TODO handle Eth Cross Connections
         self.eth_x_connect = eth_x_conn

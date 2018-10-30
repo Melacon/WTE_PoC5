@@ -1,7 +1,7 @@
 import logging
 import subprocess
 
-import wireless_emulator.emulator
+import wireless_emulator_poc5.emulator
 
 logger = logging.getLogger(__name__)
 
@@ -9,7 +9,7 @@ class Link:
     linkNumber = 1
     def __init__(self, linkEnds):
         self.linkEnds =  linkEnds
-        self.emEnv = wireless_emulator.emulator.Emulator()
+        self.emEnv = wireless_emulator_poc5.emulator.Emulator()
         self.bridgeName = None
         self.linkId = None
 

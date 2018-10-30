@@ -1,7 +1,7 @@
 import logging
 import copy
 
-from wireless_emulator.utils import addCoreDefaultValuesToNode, printErrorAndExit, addCoreDefaultStatusValuesToNode
+from wireless_emulator_poc5.utils import addCoreDefaultValuesToNode, printErrorAndExit, addCoreDefaultStatusValuesToNode
 
 
 logger = logging.getLogger(__name__)

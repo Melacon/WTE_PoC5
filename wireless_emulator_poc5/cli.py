@@ -8,9 +8,9 @@ from timeit import default_timer as timer
 from multiprocessing import Process, Manager
 import multiprocessing
 
-from wireless_emulator import *
-from wireless_emulator.clean import cleanup
-from wireless_emulator.odlregistration import registerNeToOdlNewVersion, unregisterNeFromOdlNewVersion
+from wireless_emulator_poc5 import *
+from wireless_emulator_poc5.clean import cleanup
+from wireless_emulator_poc5.odlregistration import registerNeToOdlNewVersion, unregisterNeFromOdlNewVersion
 
 class CLI(Cmd):
     prompt = 'WirelessTransportEmulator>'

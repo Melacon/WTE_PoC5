@@ -5,12 +5,12 @@ import xml.etree.ElementTree as ET
 import copy
 import ipaddress
 
-from wireless_emulator.utils import printErrorAndExit
-from wireless_emulator.ip import ManagementNetworkIPFactory, InterfaceIPFactory, MacAddressFactory
-import wireless_emulator.networkelement as NE
-import wireless_emulator.netconfserversimulator as JNE
-from wireless_emulator.utils import Singleton
-from wireless_emulator.topology import Topology
+from wireless_emulator_poc5.utils import printErrorAndExit
+from wireless_emulator_poc5.ip import ManagementNetworkIPFactory, InterfaceIPFactory, MacAddressFactory
+import wireless_emulator_poc5.networkelement as NE
+import wireless_emulator_poc5.netconfserversimulator as JNE
+from wireless_emulator_poc5.utils import Singleton
+from wireless_emulator_poc5.topology import Topology
 
 logger = logging.getLogger(__name__)
 

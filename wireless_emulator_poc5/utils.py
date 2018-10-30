@@ -2,7 +2,7 @@ import os
 import logging
 import copy
 
-from wireless_emulator.clean import cleanup
+from wireless_emulator_poc5.clean import cleanup
 
 logger = logging.getLogger(__name__)
 

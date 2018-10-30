@@ -1,1 +1,1 @@
-python3.6 setup.py build; sudo python3.6 setup.py install
+sudo rm -f /usr/local/lib/python3.6/dist-packages/wireless_emulator_poc5/*.py; rm -f ./build/lib/wireless_emulator_poc5/*.py; rm -f ./build/scripts-3.6/wtemulatorpoc5; python3.6 setup.py build; sudo python3.6 setup.py install

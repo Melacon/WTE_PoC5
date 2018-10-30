@@ -4,11 +4,11 @@ import os, sys, logging
 from optparse import OptionParser
 from timeit import default_timer as timer
 
-from wireless_emulator.emulator import Emulator
-from wireless_emulator.utils import ensureRoot
-from wireless_emulator.clean import cleanup
-from wireless_emulator.utils import Singleton
-from wireless_emulator.cli import CLI
+from wireless_emulator_poc5.emulator import Emulator
+from wireless_emulator_poc5.utils import ensureRoot
+from wireless_emulator_poc5.clean import cleanup
+from wireless_emulator_poc5.utils import Singleton
+from wireless_emulator_poc5.cli import CLI
 
 logging.basicConfig(filename='debug.log', level=logging.DEBUG,
                     format='%(asctime)s - [%(levelname)s] %(filename)s:%(lineno)d - %(message)s',

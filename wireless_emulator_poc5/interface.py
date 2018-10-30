@@ -4,8 +4,8 @@ import copy
 import datetime
 import uuid
 
-import wireless_emulator.emulator
-from wireless_emulator.utils import addCoreDefaultValuesToNode, addCoreDefaultStatusValuesToNode
+import wireless_emulator_poc5.emulator
+from wireless_emulator_poc5.utils import addCoreDefaultValuesToNode, addCoreDefaultStatusValuesToNode
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +32,7 @@ class MwpsInterface:
         self.lpUuid = self.ltpUuid + '-LP-1'
         self.clientLtpNode = None
 
-        self.emEnv = wireless_emulator.emulator.Emulator()
+        self.emEnv = wireless_emulator_poc5.emulator.Emulator()
 
         self.radioSignalId = self.findRadioSignalId()
 
@@ -514,7 +514,7 @@ class MwsInterface:
         self.ltpUuid = self.interfaceName
         self.lpUuid = self.ltpUuid + "-LP-1"
 
-        self.emEnv = wireless_emulator.emulator.Emulator()
+        self.emEnv = wireless_emulator_poc5.emulator.Emulator()
 
         self.clientLtpNode = None
         self.serverLtpsList = []
@@ -798,7 +798,7 @@ class MwEthContainerInterface:
         self.ltpUuid = self.interfaceName
         self.lpUuid = self.ltpUuid + "-LP-1"
 
-        self.emEnv = wireless_emulator.emulator.Emulator()
+        self.emEnv = wireless_emulator_poc5.emulator.Emulator()
 
         self.clientLtpNode = None
         self.serverLtps = []
@@ -1091,7 +1091,7 @@ class ElectricalEtyInterface:
         self.ltpUuid = self.interfaceName
         self.lpUuid = self.ltpUuid + "-LP-1"
 
-        self.emEnv = wireless_emulator.emulator.Emulator()
+        self.emEnv = wireless_emulator_poc5.emulator.Emulator()
 
         self.physicalPortRef = physicalPortRef
         self.clientLtpNode = None
@@ -1459,7 +1459,7 @@ class EthCtpInterface:
         for ltp in serverLtps:
             self.serverLtpsList.append(ltp['id'])
 
-        self.emEnv = wireless_emulator.emulator.Emulator()
+        self.emEnv = wireless_emulator_poc5.emulator.Emulator()
 
         self.vlanId = self.findVlanId()
 

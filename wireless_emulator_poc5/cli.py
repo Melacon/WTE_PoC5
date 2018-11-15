@@ -35,7 +35,7 @@ class CLI(Cmd):
                 # Output a message - unless it's also interrupted
                 # pylint: disable=broad-except
                 try:
-                    print( '\nKeyboard interrupt. Use quit or exit to shotdown the emulator.\n' )
+                    print( '\nKeyboard interrupt. Use quit or exit to shutdown the emulator.\n' )
                 except Exception:
                     pass
 
@@ -135,6 +135,11 @@ class CLI(Cmd):
             else:
                 print('ERROR: Node %s not found' % arg)
                 print('Usage: xterm <list_of_ne_uuids>')
+
+    def do_add_pm_entry(self, line):
+        for node in self.emulator.networkElementList:
+            if node is not None:
+                node.addNewPmEntries('period-15-min')
 
     def do_mount(self, line):
         "Triggers a mount command in ODL for the specified NEs"

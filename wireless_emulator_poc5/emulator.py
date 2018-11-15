@@ -4,6 +4,8 @@ import subprocess
 import xml.etree.ElementTree as ET
 import copy
 import ipaddress
+from time import sleep
+from threading import Thread
 
 from wireless_emulator_poc5.utils import printErrorAndExit
 from wireless_emulator_poc5.ip import ManagementNetworkIPFactory, InterfaceIPFactory, MacAddressFactory
@@ -14,7 +16,9 @@ from wireless_emulator_poc5.topology import Topology
 
 logger = logging.getLogger(__name__)
 
+
 class Emulator(metaclass=Singleton):
+#class Emulator():
 
     def __init__(self, topologyFileName = None, xmlConfigFile = None, configFileName = None):
         self.networkElementList = []
@@ -272,3 +276,19 @@ class Emulator(metaclass=Singleton):
                     continue
 
         return mem_percentage
+
+    def generateTimestampsForPM15m(self):
+        while True:
+            # every 15 minutes we generate a new entry in the XML
+            sleep(60 * 15)
+            for node in self.networkElementList:
+                if node is not None:
+                    node.addNewPmEntries('period-15-min')
+
+    def generateTimestampsForPM24h(self):
+        while True:
+            # every 24 hours we generate a new entry in the XML
+            sleep(60 * 60 * 24)
+            for node in self.networkElementList:
+                if node is not None:
+                    node.addNewPmEntries('period-24-hours')

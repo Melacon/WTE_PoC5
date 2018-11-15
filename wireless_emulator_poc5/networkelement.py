@@ -961,3 +961,8 @@ class NetworkElement:
     def runInterfaceScriptInDockerContainer(self):
         cmd = "/usr/src/OpenYuma/buildIntf.sh"
         self.executeCommandInContainer(cmd)
+
+    def addNewPmEntries(self, granularityPeriod):
+        for intf in self.interfaceList:
+            intf.addNewPmEntry(granularityPeriod)
+        self.copyXmlStatusFileToDockerContainer()

@@ -3,6 +3,7 @@ import subprocess
 import copy
 import datetime
 import uuid
+import sys
 
 import wireless_emulator_poc5.emulator
 from wireless_emulator_poc5.utils import addCoreDefaultValuesToNode, addCoreDefaultStatusValuesToNode
@@ -335,7 +336,10 @@ class MwpsInterface:
         node = currentPerformanceDataList.find('suspect-interval-flag')
         node.text = "false"
         node = currentPerformanceDataList.find('timestamp')
-        node.text = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-5] + "Z"
+        timeNow = datetime.datetime.utcnow()
+        timeNow = timeNow - datetime.timedelta(minutes=timeNow.minute % 15, seconds=timeNow.second,
+                                               microseconds=timeNow.microsecond)
+        node.text = timeNow.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-5] + "Z"
         node = currentPerformanceDataList.find('administrative-state')
         node.text = "unlocked"
         node = currentPerformanceDataList.find('performance-data/time-x-states-list/transmission-mode')
@@ -351,7 +355,10 @@ class MwpsInterface:
         node = currentPerformanceDataList.find('suspect-interval-flag')
         node.text = "false"
         node = currentPerformanceDataList.find('timestamp')
-        node.text = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-5] + "Z"
+        timeNow = datetime.datetime.utcnow()
+        timeNow = timeNow - datetime.timedelta(minutes=timeNow.minute % 15, seconds=timeNow.second,
+                                               microseconds=timeNow.microsecond)
+        node.text = timeNow.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-5] + "Z"
         node = currentPerformanceDataList.find('administrative-state')
         node.text = "unlocked"
         node = currentPerformanceDataList.find('performance-data/time-x-states-list/transmission-mode')
@@ -372,6 +379,7 @@ class MwpsInterface:
     def addHistoricalPerformances15minutes(self, parentNode, savedNode, index):
         histPerfDataList = copy.deepcopy(savedNode)
         timeNow = datetime.datetime.utcnow()
+        timeNow = timeNow - datetime.timedelta(minutes=timeNow.minute % 15, seconds=timeNow.second, microseconds=timeNow.microsecond)
 
         node = histPerfDataList.find('history-data-id')
         node.text = str(index)
@@ -380,7 +388,7 @@ class MwpsInterface:
         node = histPerfDataList.find('suspect-interval-flag')
         node.text = "false"
         node = histPerfDataList.find('period-end-time')
-        timestamp = timeNow - datetime.timedelta(minutes=15*index)
+        timestamp = timeNow - datetime.timedelta(minutes=15*(95-index))
         node.text = timestamp.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-5] + "Z"
         node = histPerfDataList.find('performance-data/time-x-states-list/transmission-mode')
         node.text = self.transmissionModeIdList[0]
@@ -390,6 +398,8 @@ class MwpsInterface:
     def addHistoricalPerformances24hours(self, parentNode, savedNode, index):
         histPerfDataList = copy.deepcopy(savedNode)
         timeNow = datetime.datetime.utcnow()
+        timeNow = timeNow - datetime.timedelta(minutes=timeNow.minute % 15, seconds=timeNow.second,
+                                               microseconds=timeNow.microsecond)
 
         node = histPerfDataList.find('history-data-id')
         node.text = str(index + 96)
@@ -398,12 +408,57 @@ class MwpsInterface:
         node = histPerfDataList.find('suspect-interval-flag')
         node.text = "false"
         node = histPerfDataList.find('period-end-time')
-        timestamp = timeNow - datetime.timedelta(days=1*index)
+        timestamp = timeNow - datetime.timedelta(days=1*(6-index))
         node.text = timestamp.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-5] + "Z"
         node = histPerfDataList.find('performance-data/time-x-states-list/transmission-mode')
         node.text = self.transmissionModeIdList[0]
 
         parentNode.append(histPerfDataList)
+
+    def addNewPmEntry(self, granularityPeriod):
+        statusXmlNode = self.neObj.statusRootXmlNode
+
+        logger.debug('Adding PM entry for airInterface |%s|' % self.lpUuid)
+
+        for airInterface in statusXmlNode.findall('mw-air-interface-pac'):
+            if airInterface.find('layer-protocol').text == self.lpUuid:
+                minHistoryId = sys.maxsize
+                maxHistoryId = 0
+                for pmEntry in airInterface.findall("air-interface-historical-performances/historical-performance-data-list"):
+                    historyId = int(pmEntry.find('history-data-id').text)
+                    if pmEntry.find('granularity-period').text == granularityPeriod:
+                        if historyId < minHistoryId:
+                            minHistoryId = historyId
+                            histPerfDataList = pmEntry
+                    if historyId > maxHistoryId:
+                        maxHistoryId = historyId
+
+                maxScannerId = 0
+                for pmEntry in airInterface.findall("air-interface-current-performance/current-performance-data-list"):
+                    scannerId = int(pmEntry.find('scanner-id').text)
+
+                    if pmEntry.find('granularity-period').text == granularityPeriod:
+                        currentPerf = pmEntry
+                    if scannerId > maxScannerId:
+                        maxScannerId = scannerId
+
+        timeNow = datetime.datetime.utcnow()
+        timeNow = timeNow - datetime.timedelta(minutes=timeNow.minute % 15, seconds=timeNow.second,
+                                               microseconds=timeNow.microsecond)
+
+        maxHistoryId = maxHistoryId + 1
+
+        node = histPerfDataList.find('history-data-id')
+        node.text = str(maxHistoryId)
+        node = histPerfDataList.find('period-end-time')
+        node.text = timeNow.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-5] + "Z"
+
+        maxScannerId = maxScannerId + 1
+        node = currentPerf.find('scanner-id')
+        node.text = str(maxScannerId)
+        node = currentPerf.find('timestamp')
+        node.text = timeNow.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-5] + "Z"
+
 
     def buildPtpModelConfigXml(self):
         parentNode = self.neObj.ptpInstanceListConfigXmlNode
@@ -708,7 +763,10 @@ class MwsInterface:
         node = currentPerformanceDataList.find('suspect-interval-flag')
         node.text = "false"
         node = currentPerformanceDataList.find('timestamp')
-        node.text = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-5] + "Z"
+        timeNow = datetime.datetime.utcnow()
+        timeNow = timeNow - datetime.timedelta(minutes=timeNow.minute % 15, seconds=timeNow.second,
+                                               microseconds=timeNow.microsecond)
+        node.text = timeNow.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-5] + "Z"
         node = currentPerformanceDataList.find('administrative-state')
         node.text = "unlocked"
         parentNode.append(currentPerformanceDataList)
@@ -721,7 +779,10 @@ class MwsInterface:
         node = currentPerformanceDataList.find('suspect-interval-flag')
         node.text = "false"
         node = currentPerformanceDataList.find('timestamp')
-        node.text = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-5] + "Z"
+        timeNow = datetime.datetime.utcnow()
+        timeNow = timeNow - datetime.timedelta(minutes=timeNow.minute % 15, seconds=timeNow.second,
+                                               microseconds=timeNow.microsecond)
+        node.text = timeNow.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-5] + "Z"
         node = currentPerformanceDataList.find('administrative-state')
         node.text = "unlocked"
         parentNode.append(currentPerformanceDataList)
@@ -740,6 +801,8 @@ class MwsInterface:
     def addHistoricalPerformances15minutes(self, parentNode, savedNode, index):
         histPerfDataList = copy.deepcopy(savedNode)
         timeNow = datetime.datetime.utcnow()
+        timeNow = timeNow - datetime.timedelta(minutes=timeNow.minute % 15, seconds=timeNow.second,
+                                               microseconds=timeNow.microsecond)
 
         node = histPerfDataList.find('history-data-id')
         node.text = str(index)
@@ -748,7 +811,7 @@ class MwsInterface:
         node = histPerfDataList.find('suspect-interval-flag')
         node.text = "false"
         node = histPerfDataList.find('period-end-time')
-        timestamp = timeNow - datetime.timedelta(minutes=15*index)
+        timestamp = timeNow - datetime.timedelta(minutes=15*(95-index))
         node.text = timestamp.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-5] + "Z"
 
         parentNode.append(histPerfDataList)
@@ -756,6 +819,8 @@ class MwsInterface:
     def addHistoricalPerformances24hours(self, parentNode, savedNode, index):
         histPerfDataList = copy.deepcopy(savedNode)
         timeNow = datetime.datetime.utcnow()
+        timeNow = timeNow - datetime.timedelta(minutes=timeNow.minute % 15, seconds=timeNow.second,
+                                               microseconds=timeNow.microsecond)
 
         node = histPerfDataList.find('history-data-id')
         node.text = str(index + 96)
@@ -764,10 +829,54 @@ class MwsInterface:
         node = histPerfDataList.find('suspect-interval-flag')
         node.text = "false"
         node = histPerfDataList.find('period-end-time')
-        timestamp = timeNow - datetime.timedelta(days=1*index)
+        timestamp = timeNow - datetime.timedelta(days=1*(6-index))
         node.text = timestamp.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-5] + "Z"
 
         parentNode.append(histPerfDataList)
+
+    def addNewPmEntry(self, granularityPeriod):
+        statusXmlNode = self.neObj.statusRootXmlNode
+
+        logger.debug('Adding PM entry for airInterface |%s|' % self.lpUuid)
+
+        for airInterface in statusXmlNode.findall('mw-pure-ethernet-structure-pac'):
+            if airInterface.find('layer-protocol').text == self.lpUuid:
+                minHistoryId = sys.maxsize
+                maxHistoryId = 0
+                for pmEntry in airInterface.findall("pure-ethernet-structure-historical-performances/historical-performance-data-list"):
+                    historyId = int(pmEntry.find('history-data-id').text)
+                    if pmEntry.find('granularity-period').text == granularityPeriod:
+                        if historyId < minHistoryId:
+                            minHistoryId = historyId
+                            histPerfDataList = pmEntry
+                    if historyId > maxHistoryId:
+                        maxHistoryId = historyId
+
+                maxScannerId = 0
+                for pmEntry in airInterface.findall("pure-ethernet-structure-current-performance/current-performance-data-list"):
+                    scannerId = int(pmEntry.find('scanner-id').text)
+
+                    if pmEntry.find('granularity-period').text == granularityPeriod:
+                        currentPerf = pmEntry
+                    if scannerId > maxScannerId:
+                        maxScannerId = scannerId
+
+        timeNow = datetime.datetime.utcnow()
+        timeNow = timeNow - datetime.timedelta(minutes=timeNow.minute % 15, seconds=timeNow.second,
+                                               microseconds=timeNow.microsecond)
+
+        maxHistoryId = maxHistoryId + 1
+
+        node = histPerfDataList.find('history-data-id')
+        node.text = str(maxHistoryId)
+        node = histPerfDataList.find('period-end-time')
+        node.text = timeNow.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-5] + "Z"
+
+        maxScannerId = maxScannerId + 1
+        node = currentPerf.find('scanner-id')
+        node.text = str(maxScannerId)
+        node = currentPerf.find('timestamp')
+        node.text = timeNow.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-5] + "Z"
 
     def buildXmlFiles(self):
         self.buildCoreModelConfigXml()
@@ -1010,7 +1119,10 @@ class MwEthContainerInterface:
         node = currentPerformanceDataList.find('suspect-interval-flag')
         node.text = "false"
         node = currentPerformanceDataList.find('timestamp')
-        node.text = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-5] + "Z"
+        timeNow = datetime.datetime.utcnow()
+        timeNow = timeNow - datetime.timedelta(minutes=timeNow.minute % 15, seconds=timeNow.second,
+                                               microseconds=timeNow.microsecond)
+        node.text = timeNow.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-5] + "Z"
         node = currentPerformanceDataList.find('administrative-state')
         node.text = "unlocked"
         parentNode.append(currentPerformanceDataList)
@@ -1023,7 +1135,10 @@ class MwEthContainerInterface:
         node = currentPerformanceDataList.find('suspect-interval-flag')
         node.text = "false"
         node = currentPerformanceDataList.find('timestamp')
-        node.text = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-5] + "Z"
+        timeNow = datetime.datetime.utcnow()
+        timeNow = timeNow - datetime.timedelta(minutes=timeNow.minute % 15, seconds=timeNow.second,
+                                               microseconds=timeNow.microsecond)
+        node.text = timeNow.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-5] + "Z"
         node = currentPerformanceDataList.find('administrative-state')
         node.text = "unlocked"
         parentNode.append(currentPerformanceDataList)
@@ -1042,6 +1157,8 @@ class MwEthContainerInterface:
     def addHistoricalPerformances15minutes(self, parentNode, savedNode, index):
         histPerfDataList = copy.deepcopy(savedNode)
         timeNow = datetime.datetime.utcnow()
+        timeNow = timeNow - datetime.timedelta(minutes=timeNow.minute % 15, seconds=timeNow.second,
+                                               microseconds=timeNow.microsecond)
 
         node = histPerfDataList.find('history-data-id')
         node.text = str(index)
@@ -1050,7 +1167,7 @@ class MwEthContainerInterface:
         node = histPerfDataList.find('suspect-interval-flag')
         node.text = "false"
         node = histPerfDataList.find('period-end-time')
-        timestamp = timeNow - datetime.timedelta(minutes=15*index)
+        timestamp = timeNow - datetime.timedelta(minutes=15*(95-index))
         node.text = timestamp.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-5] + "Z"
 
         parentNode.append(histPerfDataList)
@@ -1058,6 +1175,8 @@ class MwEthContainerInterface:
     def addHistoricalPerformances24hours(self, parentNode, savedNode, index):
         histPerfDataList = copy.deepcopy(savedNode)
         timeNow = datetime.datetime.utcnow()
+        timeNow = timeNow - datetime.timedelta(minutes=timeNow.minute % 15, seconds=timeNow.second,
+                                               microseconds=timeNow.microsecond)
 
         node = histPerfDataList.find('history-data-id')
         node.text = str(index + 96)
@@ -1066,10 +1185,54 @@ class MwEthContainerInterface:
         node = histPerfDataList.find('suspect-interval-flag')
         node.text = "false"
         node = histPerfDataList.find('period-end-time')
-        timestamp = timeNow - datetime.timedelta(days=1*index)
+        timestamp = timeNow - datetime.timedelta(days=1*(6-index))
         node.text = timestamp.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-5] + "Z"
 
         parentNode.append(histPerfDataList)
+
+    def addNewPmEntry(self, granularityPeriod):
+        statusXmlNode = self.neObj.statusRootXmlNode
+
+        logger.debug('Adding PM entry for airInterface |%s|' % self.lpUuid)
+
+        for airInterface in statusXmlNode.findall('mw-ethernet-container-pac'):
+            if airInterface.find('layer-protocol').text == self.lpUuid:
+                minHistoryId = sys.maxsize
+                maxHistoryId = 0
+                for pmEntry in airInterface.findall("ethernet-container-historical-performances/historical-performance-data-list"):
+                    historyId = int(pmEntry.find('history-data-id').text)
+                    if pmEntry.find('granularity-period').text == granularityPeriod:
+                        if historyId < minHistoryId:
+                            minHistoryId = historyId
+                            histPerfDataList = pmEntry
+                    if historyId > maxHistoryId:
+                        maxHistoryId = historyId
+
+                maxScannerId = 0
+                for pmEntry in airInterface.findall("ethernet-container-current-performance/current-performance-data-list"):
+                    scannerId = int(pmEntry.find('scanner-id').text)
+
+                    if pmEntry.find('granularity-period').text == granularityPeriod:
+                        currentPerf = pmEntry
+                    if scannerId > maxScannerId:
+                        maxScannerId = scannerId
+
+        timeNow = datetime.datetime.utcnow()
+        timeNow = timeNow - datetime.timedelta(minutes=timeNow.minute % 15, seconds=timeNow.second,
+                                               microseconds=timeNow.microsecond)
+
+        maxHistoryId = maxHistoryId + 1
+
+        node = histPerfDataList.find('history-data-id')
+        node.text = str(maxHistoryId)
+        node = histPerfDataList.find('period-end-time')
+        node.text = timeNow.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-5] + "Z"
+
+        maxScannerId = maxScannerId + 1
+        node = currentPerf.find('scanner-id')
+        node.text = str(maxScannerId)
+        node = currentPerf.find('timestamp')
+        node.text = timeNow.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-5] + "Z"
 
     def buildXmlFiles(self):
         self.buildCoreModelConfigXml()
@@ -1298,7 +1461,10 @@ class ElectricalEtyInterface:
         node = currentPerformanceDataList.find('suspect-interval-flag')
         node.text = "false"
         node = currentPerformanceDataList.find('timestamp')
-        node.text = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-5] + "Z"
+        timeNow = datetime.datetime.utcnow()
+        timeNow = timeNow - datetime.timedelta(minutes=timeNow.minute % 15, seconds=timeNow.second,
+                                               microseconds=timeNow.microsecond)
+        node.text = timeNow.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-5] + "Z"
         node = currentPerformanceDataList.find('administrative-state')
         node.text = "unlocked"
 
@@ -1312,7 +1478,10 @@ class ElectricalEtyInterface:
         node = currentPerformanceDataList.find('suspect-interval-flag')
         node.text = "false"
         node = currentPerformanceDataList.find('timestamp')
-        node.text = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-5] + "Z"
+        timeNow = datetime.datetime.utcnow()
+        timeNow = timeNow - datetime.timedelta(minutes=timeNow.minute % 15, seconds=timeNow.second,
+                                               microseconds=timeNow.microsecond)
+        node.text = timeNow.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-5] + "Z"
         node = currentPerformanceDataList.find('administrative-state')
         node.text = "unlocked"
 
@@ -1332,6 +1501,8 @@ class ElectricalEtyInterface:
     def addHistoricalPerformances15minutes(self, parentNode, savedNode, index):
         histPerfDataList = copy.deepcopy(savedNode)
         timeNow = datetime.datetime.utcnow()
+        timeNow = timeNow - datetime.timedelta(minutes=timeNow.minute % 15, seconds=timeNow.second,
+                                               microseconds=timeNow.microsecond)
 
         node = histPerfDataList.find('history-data-id')
         node.text = str(index)
@@ -1340,7 +1511,7 @@ class ElectricalEtyInterface:
         node = histPerfDataList.find('suspect-interval-flag')
         node.text = "false"
         node = histPerfDataList.find('period-end-time')
-        timestamp = timeNow - datetime.timedelta(minutes=15 * index)
+        timestamp = timeNow - datetime.timedelta(minutes=15 * (95-index))
         node.text = timestamp.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-5] + "Z"
 
         parentNode.append(histPerfDataList)
@@ -1348,6 +1519,8 @@ class ElectricalEtyInterface:
     def addHistoricalPerformances24hours(self, parentNode, savedNode, index):
         histPerfDataList = copy.deepcopy(savedNode)
         timeNow = datetime.datetime.utcnow()
+        timeNow = timeNow - datetime.timedelta(minutes=timeNow.minute % 15, seconds=timeNow.second,
+                                               microseconds=timeNow.microsecond)
 
         node = histPerfDataList.find('history-data-id')
         node.text = str(index + 96)
@@ -1356,10 +1529,54 @@ class ElectricalEtyInterface:
         node = histPerfDataList.find('suspect-interval-flag')
         node.text = "false"
         node = histPerfDataList.find('period-end-time')
-        timestamp = timeNow - datetime.timedelta(days=1 * index)
+        timestamp = timeNow - datetime.timedelta(days=1 * (6-index))
         node.text = timestamp.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-5] + "Z"
 
         parentNode.append(histPerfDataList)
+
+    def addNewPmEntry(self, granularityPeriod):
+        statusXmlNode = self.neObj.statusRootXmlNode
+
+        logger.debug('Adding PM entry for interface |%s|' % self.lpUuid)
+
+        for airInterface in statusXmlNode.findall('wire-interface-pac'):
+            if airInterface.find('layer-protocol').text == self.lpUuid:
+                minHistoryId = sys.maxsize
+                maxHistoryId = 0
+                for pmEntry in airInterface.findall("wirebased-interface-historical-performances/historical-performance-data-list"):
+                    historyId = int(pmEntry.find('history-data-id').text)
+                    if pmEntry.find('granularity-period').text == granularityPeriod:
+                        if historyId < minHistoryId:
+                            minHistoryId = historyId
+                            histPerfDataList = pmEntry
+                    if historyId > maxHistoryId:
+                        maxHistoryId = historyId
+
+                maxScannerId = 0
+                for pmEntry in airInterface.findall("wirebased-interface-current-performance/current-performance-data-list"):
+                    scannerId = int(pmEntry.find('scanner-id').text)
+
+                    if pmEntry.find('granularity-period').text == granularityPeriod:
+                        currentPerf = pmEntry
+                    if scannerId > maxScannerId:
+                        maxScannerId = scannerId
+
+        timeNow = datetime.datetime.utcnow()
+        timeNow = timeNow - datetime.timedelta(minutes=timeNow.minute % 15, seconds=timeNow.second,
+                                               microseconds=timeNow.microsecond)
+
+        maxHistoryId = maxHistoryId + 1
+
+        node = histPerfDataList.find('history-data-id')
+        node.text = str(maxHistoryId)
+        node = histPerfDataList.find('period-end-time')
+        node.text = timeNow.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-5] + "Z"
+
+        maxScannerId = maxScannerId + 1
+        node = currentPerf.find('scanner-id')
+        node.text = str(maxScannerId)
+        node = currentPerf.find('timestamp')
+        node.text = timeNow.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-5] + "Z"
 
 
     def buildPtpModelConfigXml(self):

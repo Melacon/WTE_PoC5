@@ -544,9 +544,14 @@ class NetworkElement:
                             (self.managementIPAddressString, self.netconfPortNumber,
                              self.managementIPAddressString, self.sshPortNumber, self.dockerName)
             else:
-                stringCmd = "docker create -it --privileged -p %s:%s:830 -p %s:%s:22 --name=%s openyumawte5" % \
-                            (self.managementIPAddressString, self.netconfPortNumber,
-                             self.managementIPAddressString, self.sshPortNumber, self.dockerName)
+                if self.emEnv.netconfCandidateDatastore is False:
+                    stringCmd = "docker create -it --privileged -p %s:%s:830 -p %s:%s:22 --name=%s openyumawte5" % \
+                                (self.managementIPAddressString, self.netconfPortNumber,
+                                 self.managementIPAddressString, self.sshPortNumber, self.dockerName)
+                else:
+                    stringCmd = "docker create -it --privileged -e DATASTORE='candidate' -p %s:%s:830 -p %s:%s:22 --name=%s openyumawte5" % \
+                                (self.managementIPAddressString, self.netconfPortNumber,
+                                self.managementIPAddressString, self.sshPortNumber, self.dockerName)
         else:
             self.createDockerNetwork()
             stringCmd = None
@@ -556,11 +561,16 @@ class NetworkElement:
                              self.managementIPAddressString, self.sshPortNumber,
                              self.dockerName, self.networkName)
             else:
-                stringCmd = "docker create -it --privileged -p %s:%s:830 -p %s:%s:22 --name=%s --network=%s openyumawte5" % \
+                if self.emEnv.netconfCandidateDatastore is False:
+                    stringCmd = "docker create -it --privileged -p %s:%s:830 -p %s:%s:22 --name=%s --network=%s openyumawte5" % \
                             (self.managementIPAddressString, self.netconfPortNumber,
                              self.managementIPAddressString, self.sshPortNumber,
                              self.dockerName, self.networkName)
-
+                else:
+                    stringCmd = "docker create -it --privileged -e DATASTORE='candidate' -p %s:%s:830 -p %s:%s:22 --name=%s --network=%s openyumawte5" % \
+                                (self.managementIPAddressString, self.netconfPortNumber,
+                                 self.managementIPAddressString, self.sshPortNumber,
+                                 self.dockerName, self.networkName)
 
         if stringCmd is not None:
             self.emEnv.executeCommandInOS(stringCmd)

@@ -66,6 +66,7 @@ class Emulator(metaclass=Singleton):
             self.intfIpFactory = InterfaceIPFactory('10.10.0.0/16')
 
         self.macAddressFactory = MacAddressFactory()
+        self.netconfCandidateDatastore = False
 
         self.netconfPortBase = None
         self.sshPortBase = None
@@ -76,6 +77,9 @@ class Emulator(metaclass=Singleton):
             self.sshPortBase = self.configJson['sshPortBase']
             self.portBasedEmulation = True
             self.emulatorIp = self.configJson['emulatorIpAddress']
+
+        if 'netconfCandidateDatastore' in self.configJson:
+            self.netconfCandidateDatastore = self.configJson['netconfCandidateDatastore']
 
         self.saveControllerInfo()
 
